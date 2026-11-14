@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<meta name="description" content="Offline image forensics and CTF investigation workstation">
+<title>CipherSight — Forensic Workstation</title>
+<link rel="icon" href="/static/logo.jpg" type="image/jpeg">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand-lockup"><img class="brand-logo" src="/static/logo.jpg" alt="CipherSight logo" height="42"><div><div class="brand">CIPHERSIGHT</div><div class="brand-sub">FORENSIC WORKSTATION</div></div></div>
+    <nav class="nav">
+      <div class="side-label">OVERVIEW</div>
+      <button class="navbtn active" data-page="dashboard" type="button">◈ &nbsp; Dashboard</button>
+      <button class="navbtn" data-page="analyze" type="button">＋ &nbsp; New Investigation</button>
+      <button class="navbtn" data-page="history" type="button">⟲ &nbsp; Scan History</button>
+      <div class="side-label">FINDINGS</div>
+      <button class="navbtn" data-page="results" type="button">⌘ &nbsp; Findings &amp; Evidence</button>
+      <button class="navbtn" data-page="confirmed" type="button">✔ &nbsp; Confirmed Flags</button>
+      <button class="navbtn" data-page="candidates" type="button">? &nbsp; Unverified Candidates</button>
+      <button class="navbtn" data-page="decoys" type="button">⚑ &nbsp; Decoy Flags</button>
+      <div class="side-label">ANALYSIS</div>
+      <button class="navbtn" data-page="stego" type="button">▦ &nbsp; Steganography</button>
+      <button class="navbtn" data-page="clues" type="button">¶ &nbsp; Text and Clues</button>
+      <button class="navbtn" data-page="metadata" type="button">▣ &nbsp; Metadata</button>
+      <button class="navbtn" data-page="embedded" type="button">⧉ &nbsp; Embedded Files</button>
+      <button class="navbtn" data-page="ocr" type="button">▯ &nbsp; OCR and QR</button>
+      <button class="navbtn" data-page="forensic" type="button">⌁ &nbsp; Forensic Analysis</button>
+      <div class="side-label">RECORDS</div>
+      <button class="navbtn" data-page="logs" type="button">≡ &nbsp; Scan Logs</button>
+      <button class="navbtn" data-page="export" type="button">▤ &nbsp; Reports</button>
+      <button class="navbtn" data-page="about" type="button">ⓘ &nbsp; About</button>
+    </nav>
+    <div class="sidefoot"><span class="live-dot"></span> LOCAL ENGINE ONLINE<br><small>Private · Offline · On-device</small></div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div><div class="eyebrow">CIPHERSIGHT / INVESTIGATION CONSOLE</div><h1 id="pageTitle">Dashboard</h1></div>
+      <div class="top-right"><span class="top-brand"><img class="top-logo" src="/static/logo.jpg" alt="CipherSight logo" height="34"><span class="top-brand-text">CipherSight</span></span><span class="local-chip"><span class="live-dot"></span> LOCALHOST</span><span id="statusPill" class="pill idle">IDLE</span></div>
+    </header>
+
+    <!-- Overview -->
+    <section id="page-dashboard" class="page">
+      <div class="panel">
+        <div class="eyebrow">OFFLINE DIGITAL FORENSICS</div>
+        <h2>Statistics from this session</h2>
+        <p class="muted">Every number below is computed from the scan results stored by this server. Results are kept in memory and clear when the server stops.</p>
+        <div class="cards" id="statsCards"></div>
+      </div>
+      <div class="panel"><h2>Recent scans</h2><div id="dashRecent"></div></div>
+      <div class="panel">
+        <h2>Investigation safety</h2>
+        <p class="muted">Analysis runs locally. Input files are treated as untrusted evidence, recovered files are never executed, and candidate flags require analyst verification.</p>
+      </div>
+    </section>
+
+    <section id="page-analyze" class="page hidden">
+      <div class="panel">
+        <div id="dropzone" class="dropzone">
+          <div class="upload-glyph">⇧</div><div class="dz-title">Drop evidence to begin an investigation</div>
+          <div class="dz-sub">Choose an image or supported binary artifact. Your original file is never modified.</div>
+          <label class="btn ghost">Choose file
+            <input id="fileInput" type="file" accept="image/*,.bin,.zip" hidden>
+          </label>
+          <div id="fileName" class="muted">No file selected.</div>
+        </div>
+        <div class="row">
+          <button id="btnStart" class="btn primary" type="button" disabled>Start forensic scan</button>
+          <span id="analyzeError" class="error" role="alert"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="progressline"><span id="progText">Waiting for a scan.</span><span id="progPct">0%</span></div>
+        <div class="bar"><div id="progBar" class="barfill"></div></div>
+        <div class="progmeta" id="progMeta"></div>
+      </div>
+      <div class="panel console-panel">
+        <div class="console-head">LIVE FORENSIC SCAN CONSOLE</div>
+        <div class="console-tools">
+          <label class="lvl"><input type="checkbox" data-level="INFO" checked>INFO</label>
+          <label class="lvl"><input type="checkbox" data-level="SUCCESS" checked>SUCCESS</label>
+          <label class="lvl"><input type="checkbox" data-level="WARNING" checked>WARNING</label>
+          <label class="lvl"><input type="checkbox" data-level="ERROR" checked>ERROR</label>
+          <label class="lvl"><input type="checkbox" data-level="FINDING" checked>FINDING</label>
+          <label class="lvl"><input type="checkbox" data-level="DEBUG">DEBUG</label>
+          <input id="consoleSearch" type="search" placeholder="Search console">
+          <label class="lvl"><input id="autoscroll" type="checkbox" checked>Auto-scroll</label>
+        </div>
+        <div class="console-tools">
+          <button id="btnPause" class="btn small" type="button">Pause display</button>
+          <button id="btnClear" class="btn small" type="button">Clear console</button>
+          <button id="btnCopyLog" class="btn small" type="button">Copy logs</button>
+          <button id="btnExportLog" class="btn small" type="button">Export logs as TXT</button>
+          <span id="pausedNote" class="muted"></span>
+        </div>
+        <div id="console" class="console" role="log" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="page-history" class="page hidden">
+      <div class="panel"><h2>Scan history</h2>
+        <p class="muted">Scans from this server session, newest first. Open one to review its findings.</p>
+        <div id="historyBody"></div>
+      </div>
+    </section>
+
+    <!-- Findings: every page below is rendered from the selected scan's summary -->
+    <section id="page-results" class="page hidden" data-view="results"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-confirmed" class="page hidden" data-view="confirmed"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-candidates" class="page hidden" data-view="candidates"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-decoys" class="page hidden" data-view="decoys"><div class="gate muted"></div><div class="pagebody"></div></section>
+
+    <!-- Analysis -->
+    <section id="page-stego" class="page hidden" data-view="stego"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-clues" class="page hidden" data-view="clues"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-metadata" class="page hidden" data-view="metadata"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-embedded" class="page hidden" data-view="embedded"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-ocr" class="page hidden" data-view="ocr"><div class="gate muted"></div><div class="pagebody"></div></section>
+    <section id="page-forensic" class="page hidden" data-view="forensic"><div class="gate muted"></div><div class="pagebody"></div></section>
+
+    <!-- Records -->
+    <section id="page-logs" class="page hidden" data-view="logs"><div class="gate muted"></div><div class="pagebody"></div></section>
+
+    <section id="page-export" class="page hidden">
+      <div id="exportEmpty" class="panel muted">Run a scan first. Reports appear here when it finishes.</div>
+      <div id="exportBody" class="hidden panel">
+        <h2>Reports</h2>
+        <p class="muted">Reports are written when a scan finishes. Analyst decisions made afterwards appear in the on-screen views, not in exported files.</p>
+        <div class="row">
+          <a id="linkHtml" class="btn primary" href="#" target="_blank" rel="noopener">Open HTML report</a>
+          <a id="linkJson" class="btn" href="#" download="scan_report.json">Download JSON report</a>
+          <a id="linkPdf" class="btn" href="#" download="scan_report.pdf">Download PDF report</a>
+        </div>
+        <h2>Evidence</h2>
+        <div class="kv"><div class="k">File</div><div id="evFile" class="v"></div></div>
+        <div class="kv"><div class="k">SHA-256</div><div id="evHash" class="v mono"></div></div>
+        <div class="row"><button id="btnCopyHash" class="btn small" type="button">Copy hash</button></div>
+      </div>
+    </section>
+
+    <section id="page-about" class="page hidden">
+      <div class="panel">
+        <h2>CipherSight</h2>
+        <p class="muted">Offline image forensics and CTF investigation toolkit.</p>
+        <div class="kv"><div class="k">Developer</div><div class="v">Saadullah Abdul Wahid</div></div>
+        <div class="kv"><div class="k">LinkedIn</div><div class="v"><a href="#" data-profile="linkedin">Saadullah Abdul Wahid</a></div></div>
+        <div class="kv"><div class="k">X (Twitter)</div><div class="v"><a href="#" data-profile="x">@saadullahabd</a></div></div>
+      </div>
+      <div class="panel"><h2>Feedback</h2><p>If you like CipherSight, please share your feedback, suggestions, bug reports, and ideas for improvement. Your feedback helps us make CipherSight better.</p></div>
+    </section>
+  </main>
+</div>
+<div id="flash" class="flash hidden" role="status"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

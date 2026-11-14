@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imagehunter"
+version = "1.0.0rc4"
+description = "CipherSight — offline image forensics and CTF steganography toolkit"
+requires-python = ">=3.10"
+dependencies = ["Pillow>=10.0,<13", "numpy>=1.24,<3", "reportlab>=4.0,<5"]
+
+[project.optional-dependencies]
+ocr = ["pytesseract>=0.3.10,<1"]
+vision = ["opencv-python-headless>=4.8,<5"]
+jpeg-dct = ["jpegio>=0.2.8"]
+all = ["pytesseract>=0.3.10,<1", "opencv-python-headless>=4.8,<5", "jpegio>=0.2.8"]
+
+[project.scripts]
+imagehunter = "imagehunter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"imagehunter.config" = ["*.json"]
+"imagehunter.web" = ["static/*.jpg", "static/*.js", "static/*.css", "static/*.html"]

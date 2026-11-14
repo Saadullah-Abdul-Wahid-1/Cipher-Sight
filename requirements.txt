@@ -1,0 +1,4 @@
+# Core runtime dependencies. Optional extras are declared in pyproject.toml.
+Pillow>=10.0,<13
+numpy>=1.24,<3
+reportlab>=4.0,<5

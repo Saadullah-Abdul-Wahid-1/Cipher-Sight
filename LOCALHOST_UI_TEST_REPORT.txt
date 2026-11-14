@@ -1,0 +1,22 @@
+ImageHunter RC4 Localhost UI refresh - verification record
+
+Changes:
+- Refreshed the existing local web frontend HTML and CSS.
+- Added a responsive workstation layout, new dashboard hero, visual forensic/orbital motif,
+  updated navigation labels, improved upload zone, responsive cards and 3D-inspired CSS depth.
+- Kept the existing JavaScript hooks and backend API routes intact.
+- Added ImageHunter_Localhost.bat for Windows startup at http://127.0.0.1:8000/.
+- Added run_localhost.sh for Linux/macOS startup.
+- Added README instructions.
+
+Verified in sandbox:
+- Python compileall: passed.
+- Local web server smoke test: GET /, /static/app.css, /static/app.js and /api/status all returned HTTP 200.
+- End-to-end upload through /api/scans: accepted (HTTP 201), scan completed, summary endpoint returned successfully.
+- Targeted tests: 44 tests run; 43 passed and 1 failed.
+- Failure: tests.unit.test_lsb.AnalyzerBehaviourTests.test_signal_hunt_like_image_yields_both_layers_with_exact_locations
+  expected two exact flag strings but also received 'tTHM{03fbc75b9aa0}'. This is an LSB analyzer regression/false-positive issue and is not claimed fixed by this UI-only refresh.
+- Full unittest discovery exceeded the 120-second sandbox limit; no full-suite pass is claimed.
+- Windows launcher was authored but not executed on a Windows host.
+
+Release status: still RC. Manual Windows testing and LSB regression investigation are required before v1.0.0 release.
